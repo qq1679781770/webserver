@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<server>
+    <port>8001</port>
+    <charset>GBK</charset>
+    <logpath></logpath>
+    <mvc>
+        <handlers>
+            <handler></handler>
+        </handlers>
+        <interceptors>
+            <interceptor>
+
+            </interceptor>
+        </interceptors>
+        <statics>
+            <static>
+
+            </static>
+        </statics>
+    </mvc>
+</server>
