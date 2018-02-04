@@ -3,6 +3,7 @@ package com.jsxnh.util;
 import com.jsxnh.config.ServerConfig;
 import com.jsxnh.exception.ServerConfigNotFoundException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -11,6 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Handler;
 
 public class XMLUtil {
 
@@ -33,6 +35,14 @@ public class XMLUtil {
             NodeList charsetlist = document.getElementsByTagName("charset");
             if(charsetlist.getLength()!=0){
                 serverConfig.setCharset(charsetlist.item(0).getTextContent());
+            }
+            NodeList handlerlist = document.getElementsByTagName("handler");
+            for(int i=0;i<handlerlist.getLength();i++){
+                serverConfig.addRouter(handlerlist.item(i).getTextContent().trim());
+            }
+            NodeList staticlist = document.getElementsByTagName("static");
+            for(int i=0;i<staticlist.getLength();i++){
+                ServerConfig.router.addRouter(handlerlist.item(i).getTextContent().trim());
             }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

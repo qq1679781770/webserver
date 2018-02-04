@@ -51,5 +51,8 @@ public class PathUtil {
     }
 
 
+    public static String getTempPath(String path){
+        return path.substring(getRootPath().length());
+    }
 
 }

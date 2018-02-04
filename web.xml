@@ -5,7 +5,7 @@
     <logpath></logpath>
     <mvc>
         <handlers>
-            <handler></handler>
+            <!--<handler></handler>-->
         </handlers>
         <interceptors>
             <interceptor>

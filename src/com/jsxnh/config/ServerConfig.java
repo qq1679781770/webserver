@@ -1,8 +1,10 @@
 package com.jsxnh.config;
 
+import com.jsxnh.exception.SameRouterException;
 import com.jsxnh.exception.ServerConfigNotFoundException;
 import com.jsxnh.util.LoggerUtil;
 import com.jsxnh.util.XMLUtil;
+import com.jsxnh.web.Router;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -17,15 +19,32 @@ public class ServerConfig {
     public static String logPath = null;
     public static Logger logger = LoggerUtil.getLogger(ServerConfig.class);
 
-    public ServerConfig(){
+    public  Router getRouter() {
+        return router;
+    }
 
+    public static Router router;
+
+    public ServerConfig(){
+        router = new Router();
     }
 
     public ServerConfig(String webxmlfilename){
         this.webxmlfilename = webxmlfilename;
+        router = new Router();
         try {
             XMLUtil.parse(this);
         } catch (ServerConfigNotFoundException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
+    }
+
+    public void addRouter(String classname){
+        try {
+            router.addRouter(Class.forName(classname));
+        } catch (SameRouterException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        } catch (ClassNotFoundException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
     }

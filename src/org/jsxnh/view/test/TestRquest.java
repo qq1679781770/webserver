@@ -1,12 +1,12 @@
 package org.jsxnh.view.test;
 
 import com.jsxnh.config.ServerConfig;
+import com.jsxnh.server.Server;
 
-public class TestXML {
+public class TestRquest {
 
     public static void main(String[] args){
         ServerConfig serverConfig = new ServerConfig("web.xml");
-        System.out.println(serverConfig);
+        new Server(serverConfig).start();
     }
-
 }

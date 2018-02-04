@@ -25,7 +25,6 @@ public class LoggerUtil {
     static {
         try {
             File fileName = new File(getLogFilePath());
-            System.out.println(fileName.getAbsolutePath());
             if (!fileName.exists()) {
                 fileName.getParentFile().mkdirs();
             }
