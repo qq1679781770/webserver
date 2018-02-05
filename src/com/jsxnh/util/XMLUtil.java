@@ -42,7 +42,7 @@ public class XMLUtil {
             }
             NodeList staticlist = document.getElementsByTagName("static");
             for(int i=0;i<staticlist.getLength();i++){
-                ServerConfig.router.addRouter(handlerlist.item(i).getTextContent().trim());
+                serverConfig.getRouter().addRouter(staticlist.item(i).getTextContent().trim());
             }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

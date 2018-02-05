@@ -76,7 +76,13 @@ public class Server {
                                 }
                             }
                         } else if (key.isReadable()) {
-                            new Thread(new HttpHandlerRunable((SocketChannel)key.channel(),key)).start();
+                            new HttpHandlerRunable((SocketChannel) key.channel(),key).doRead();
+                        }else if (key.isWritable()) {
+                            //该key有Write事件
+                            logger.info("有流写出!");
+                            SocketChannel socketChannel = (SocketChannel)key.channel();
+                            socketChannel.socket().close();
+                            socketChannel.close();
                         }
                     } catch (IOException e) {
                     } catch (Exception e) {

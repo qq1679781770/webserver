@@ -72,6 +72,7 @@ public class Router {
                 }
                 for(File f:filelist){
                     String url = PathUtil.getTempPath(f.getAbsolutePath());
+                    url = url.replaceAll("\\\\","/");
                     if(routerMap.containsKey(url)){
                         continue;
                     }

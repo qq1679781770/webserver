@@ -12,14 +12,14 @@ public class ContentTypeUtil {
         map.put(".html","text/html");
         map.put(".jpe","image/jpeg");
         map.put(".jpeg","image/jpeg");
-        map.put(".jpg","application/x-jpg");
+        map.put(".jpg","application/jpg");
         map.put(".css","text/css");
-        map.put(".js","application/x-javascript");
+        map.put(".js","application/javascript");
         map.put(".png","image/png");
 
     }
 
-    public String getContent_Type(String filesuffix){
+    public static  String getContent_Type(String filesuffix){
         if(map.containsKey(filesuffix))
             return map.get(filesuffix);
         return null;

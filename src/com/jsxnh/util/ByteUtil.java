@@ -14,4 +14,11 @@ public class ByteUtil {
         }
         return r;
     }
+
+
+    public static byte[] subBytes(byte[] b, int start, int length) {
+        byte bytes[] = new byte[length];
+        System.arraycopy(b, start, bytes, 0, length);
+        return bytes;
+    }
 }

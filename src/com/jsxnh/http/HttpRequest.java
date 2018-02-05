@@ -30,18 +30,18 @@ public class HttpRequest implements Request{
     private SocketChannel channel;
     private String referer;
     private Context context;
+    private byte[] bytes;
+
     public static Logger logger = LoggerUtil.getLogger(HttpRequest.class);
 
     public HttpRequest(SocketChannel sc){
         this.channel = sc;
-        init();
     }
 
-
-    private void init(){
+    public byte[] doread(){
         try {
             ByteBuffer buffer = ByteBuffer.allocate(1024);
-            byte[] bytes = null;
+
             int size = 0;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             while ((size = channel.read(buffer)) > 0) {
@@ -52,9 +52,14 @@ public class HttpRequest implements Request{
                 buffer.clear();
             }
             bytes = baos.toByteArray();
-            if(bytes.length==0){
-                return;
-            }
+        }catch (Exception e){
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
+        return bytes;
+    }
+
+    public void init(){
+        try {
             String requeststr = new String(bytes);
             initSchema(requeststr.split("\r\n")[0]);
             //requeststr.indexOf("\r\n\r\n");

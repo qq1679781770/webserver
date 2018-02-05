@@ -3,11 +3,12 @@ package com.jsxnh.http;
 import com.jsxnh.http.abs.Context;
 import com.jsxnh.util.LoggerUtil;
 
+import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Logger;
 
-public class HttpHandlerRunable implements Runnable{
+public class HttpHandlerRunable{
     public static Logger logger = LoggerUtil.getLogger(HttpHandlerRunable.class);
 
     private SocketChannel channel;
@@ -20,10 +21,22 @@ public class HttpHandlerRunable implements Runnable{
         context = new ServerContext();
     }
 
-    @Override
-    public void run() {
+
+    public  void doRead(){
 
         context.setContext(channel,key);
-        HttpHandler.init(context);
+        byte[] b = ((HttpRequest)context.getRequest()).doread();
+        if(b==null||b.length==0){
+            return;
+        }
+
+        new Thread(){
+            @Override
+            public void run(){
+                System.out.println("new Thread run");
+                HttpHandler.init(context);
+            }
+        }.start();
+
     }
 }
