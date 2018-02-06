@@ -3,10 +3,10 @@ package com.jsxnh.annotation;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.PARAMETER})
+@Target({ElementType.METHOD,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface RequestBody {
-
+public @interface Interceptor {
+    String value();
 }

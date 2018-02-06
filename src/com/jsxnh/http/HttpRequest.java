@@ -24,6 +24,7 @@ public class HttpRequest implements Request{
     private String charset;
     private String protocol;
     private Map<String,Object> attributes;
+
     private Map<String,String> headerParams;
     private InputStream inputStream;
     private Cookie cookie;
@@ -31,6 +32,10 @@ public class HttpRequest implements Request{
     private String referer;
     private Context context;
     private byte[] bytes;
+
+
+
+    private byte[] requestbody;
 
     public static Logger logger = LoggerUtil.getLogger(HttpRequest.class);
 
@@ -62,7 +67,20 @@ public class HttpRequest implements Request{
         try {
             String requeststr = new String(bytes);
             initSchema(requeststr.split("\r\n")[0]);
-            //requeststr.indexOf("\r\n\r\n");
+            String[] requestheaders = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")).split("\r\n");
+            for(int i=1;i<requestheaders.length;i++){
+                if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Content_Type")){
+                    attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
+                    context_type = requestheaders[i].split(";")[0].substring(requestheaders[i].indexOf(":")+1);
+                    charset = requestheaders[i].split(";")[1].substring(requestheaders[i].split(";")[1].indexOf(":")+1);
+                }else if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Cookie")){
+                    String cookies = requestheaders[i].substring(requestheaders[i].indexOf(":")+1);
+                    cookie = new Cookie(cookies);
+                }else{
+                    attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
+                }
+            }
+            requestbody = requeststr.substring(requeststr.indexOf("\r\n\r\n")+"\r\n\r\n".length()).getBytes();
 
 
 
@@ -89,8 +107,8 @@ public class HttpRequest implements Request{
             String paramstr = s[1].substring(s[1].indexOf("?"));
             String[] params = paramstr.split("&");
             for(String p:params){
-                headerParams.put(p.substring(0,p.indexOf("=")),p.substring(p.indexOf("=")));
-                attributes.put(p.substring(0,p.indexOf("=")),p.substring(p.indexOf("=")));
+                headerParams.put(p.substring(0,p.indexOf("=")),p.substring(p.indexOf("=")+1));
+                attributes.put(p.substring(0,p.indexOf("=")),p.substring(p.indexOf("=")+1));
             }
         }
     }
@@ -142,12 +160,12 @@ public class HttpRequest implements Request{
 
     @Override
     public Cookie getCookie() {
-        return null;
+        return cookie;
     }
 
     @Override
     public Boolean isCookie() {
-        return null;
+        return cookie!=null;
     }
 
     @Override
@@ -164,4 +182,13 @@ public class HttpRequest implements Request{
     public void setContext(Context context) {
         this.context = context;
     }
+
+    public byte[] getRequestbody() {
+        return requestbody;
+    }
+
+    public Map<String, String> getHeaderParams() {
+        return headerParams;
+    }
+
 }

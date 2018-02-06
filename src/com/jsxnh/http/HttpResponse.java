@@ -6,6 +6,7 @@ import com.jsxnh.util.ByteUtil;
 import com.jsxnh.util.ContentTypeUtil;
 import com.jsxnh.util.LoggerUtil;
 import com.jsxnh.web.Cookie;
+import com.jsxnh.web.ModelAndView;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -25,12 +26,26 @@ public class HttpResponse implements Response{
     private String content_type;
     private String charset;
     private Date date;
-    private String connection;
+    private String connection = "keep-alive";
     private String content_length;
     private Cookie cookie;
-    private String statuscode;
+    private String statuscode = "200 OK";
 
     public static Logger logger = LoggerUtil.getLogger(HttpResponse.class);
+
+
+    public void setContent_type(String content_type) {
+        this.content_type = content_type;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
+    }
+
+    public void setCookie(Cookie cookie) {
+        this.cookie = cookie;
+    }
+
 
 
     public HttpResponse(SelectionKey key){
@@ -102,8 +117,8 @@ public class HttpResponse implements Response{
             FileInputStream inputStream = new FileInputStream(file);
             int length = inputStream.available();
             String header = "HTTP/1.1 200 OK\r\n"+
-                    "Content_Type:"+context_type+"\r\n"+
-                    //"Content_Length:"+String.valueOf(length)+"\r\n"+
+                    "Content_Type:"+context_type+";charset:utf-8\r\n"+
+                    "Content_Length:"+String.valueOf(length)+"\r\n"+
                     "Date:"+new Date()+"\r\n\r\n";
 
             ByteBuffer headerbuffer = ByteBuffer.allocate(header.getBytes().length);
@@ -128,6 +143,20 @@ public class HttpResponse implements Response{
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
 
+
+    }
+
+
+    public void sendResponse(ModelAndView modelAndView){
+
+
+    }
+
+    public void sendResponseBody(String s){
+
+    }
+
+    public void sendResponseView(String view){
 
     }
 }

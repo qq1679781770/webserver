@@ -1,12 +1,11 @@
 package com.jsxnh.annotation;
 
-
 import java.lang.annotation.*;
 
-@Target({ElementType.PARAMETER})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface RequestBody {
+public @interface ResponseBody {
 
 }

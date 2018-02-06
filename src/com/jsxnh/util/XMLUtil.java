@@ -44,6 +44,20 @@ public class XMLUtil {
             for(int i=0;i<staticlist.getLength();i++){
                 serverConfig.getRouter().addRouter(staticlist.item(i).getTextContent().trim());
             }
+            NodeList interlist = document.getElementsByTagName("interceptor");
+            for(int i=0;i<interlist.getLength();i++){
+                NodeList childs = interlist.item(i).getChildNodes();
+                String name = "";
+                String value = "";
+                for(int j=0;j<childs.getLength();j++){
+                    if(childs.item(j).getNodeName().equals("name")){
+                        name = childs.item(j).getTextContent().trim();
+                    }else if(childs.item(j).getNodeName().equals("class")){
+                        value = childs.item(j).getTextContent().trim();
+                    }
+                }
+                serverConfig.addInterceptor(name,value);
+            }
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {

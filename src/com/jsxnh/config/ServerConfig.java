@@ -1,5 +1,6 @@
 package com.jsxnh.config;
 
+import com.jsxnh.exception.NotFoundInteceptor;
 import com.jsxnh.exception.SameRouterException;
 import com.jsxnh.exception.ServerConfigNotFoundException;
 import com.jsxnh.util.LoggerUtil;
@@ -7,6 +8,8 @@ import com.jsxnh.util.XMLUtil;
 import com.jsxnh.web.Router;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +21,7 @@ public class ServerConfig {
     private String charset = "utf-8";
     public static String logPath = null;
     public static Logger logger = LoggerUtil.getLogger(ServerConfig.class);
-
+    public Map<String,Class> InterceptorMap = new HashMap<>();
     public  Router getRouter() {
         return router;
     }
@@ -46,6 +49,19 @@ public class ServerConfig {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         } catch (ClassNotFoundException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
+    }
+
+    public void addInterceptor(String name,String classname){
+        try{
+            Class c = Class.forName(classname);
+            InterceptorMap.put(name,c);
+        }catch (Exception e){
+            try {
+                throw new NotFoundInteceptor(classname);
+            }catch (NotFoundInteceptor notFoundInteceptor){
+                logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(notFoundInteceptor));
+            }
         }
     }
 
@@ -97,4 +113,10 @@ public class ServerConfig {
                 ", charset='" + charset + '\'' +
                 '}';
     }
+
+    public Map<String, Class> getInterceptorMap() {
+        return InterceptorMap;
+    }
+
+
 }

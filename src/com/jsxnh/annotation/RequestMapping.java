@@ -12,7 +12,6 @@ public @interface RequestMapping {
 
     String value();
     HttpMethod method() default HttpMethod.GET;
-    String produces();
-    String consumes();
+    String produce();
 
 }
