@@ -2,17 +2,19 @@ package com.jsxnh.web;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class Session {
 
-    private int id;
+    private String id;
     public Map<String,Object> attributes = new HashMap<>();
+    public static Map<String,Session> SessionMap = new HashMap<>();
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -20,6 +22,10 @@ public class Session {
 
     public void addAttribute(String s,Object o){
         attributes.put(s,o);
+    }
+
+    public void removeAttribute(String key){
+        attributes.remove(key);
     }
 
     public Map getAttributes(){
@@ -38,4 +44,16 @@ public class Session {
         return null;
     }
 
+
+    public static synchronized String generatorId(){
+        return UUID.randomUUID().toString();
+    }
+
+    public static void addSession(String id,Session session){
+        SessionMap.put(id,session);
+    }
+
+    public static Session getSession(String id){
+        return SessionMap.get(id);
+    }
 }

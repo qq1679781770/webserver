@@ -93,7 +93,25 @@ public class HttpRequest implements Request{
 
     }
 
+    public Session getSession(){
+        if(cookie==null){
+            cookie = new Cookie();
+        }
+        if(cookie.getAttriute(Cookie.SESSION) == null){
+            Session session = new Session();
+            session.setId(Session.generatorId());
+            Session.addSession(session.getId(),session);
+            cookie.addAttribue(Cookie.SESSION,session.getId());
+            return session;
+        }
+        System.out.println(cookie.getCookieStr());
+        String id = cookie.getAttriute(Cookie.SESSION);
+        Session session = Session.getSession(id);
+        return session;
+    }
+
     private void initSchema(String headerfirst){
+        //System.out.println(headerfirst);
         String s[] = headerfirst.split(" ");
         String method = s[0];
         if(method.equals("GET")){
@@ -107,7 +125,7 @@ public class HttpRequest implements Request{
             this.uri = s[1];
         }else{
             this.uri = s[1].substring(0,s[1].indexOf("?"));
-            String paramstr = s[1].substring(s[1].indexOf("?"));
+            String paramstr = s[1].substring(s[1].indexOf("?")+1);
             String[] params = paramstr.split("&");
             for(String p:params){
                 headerParams.put(p.substring(0,p.indexOf("=")),p.substring(p.indexOf("=")+1));
@@ -156,10 +174,7 @@ public class HttpRequest implements Request{
         return attributes;
     }
 
-    @Override
-    public Session getSession() {
-        return null;
-    }
+
 
     @Override
     public Cookie getCookie() {

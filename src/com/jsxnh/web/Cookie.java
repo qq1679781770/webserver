@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Cookie {
     String cookies;
+    public static final String SESSION = "SessionID";
 
     public Map<String, String> getAttributes() {
         return attributes;
@@ -15,6 +16,10 @@ public class Cookie {
     public Cookie(String s){
         this.cookies = s;
         init();
+    }
+
+    public Cookie(){
+
     }
 
     public void init(){
@@ -44,5 +49,9 @@ public class Cookie {
         }
         String s = stringBuilder.toString();
         return s.substring(0,s.length()-1);
+    }
+
+    public void addAttribue(String key,String value){
+        attributes.put(key,value);
     }
 }

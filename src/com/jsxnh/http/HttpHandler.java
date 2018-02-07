@@ -77,6 +77,7 @@ public class HttpHandler {
                         objects[i] = new String(request.getRequestbody());
                     }else if(p.getAnnotation(Requestparam.class)!=null){
                         String value = ((Requestparam)p.getAnnotation(Requestparam.class)).value();
+                        System.out.println(value);
                         objects[i] = request.getHeaderParams().get(value);
                     }else {
                         Class aClass = p.getType();

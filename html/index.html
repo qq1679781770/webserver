@@ -4,8 +4,41 @@
     <meta charset="UTF-8">
     <script src="static/js/jquery.min.js"></script>
     <script src="static/js/jsxnh.js"></script>
+    <script>
+        console.log('hello world');
+        $(function(){
+           $('#span').css('color','green');
+
+            $('#register').click(function(){
+                console.log('sa');
+                var username = $('#userid').val();
+                var password = $('#password').val();
+                getJSON('register',{"userid":username,"password":password},function(data){
+                    console.log(data);
+                });
+            });
+            $('#login').click(function(){
+                var username = $('#userid').val();
+                var password = $('#password').val();
+                postJSON('login',{"username":username,"password":password},function(data){
+                    console.log(data);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     hello world
+
+    <form>
+        <input id="userid" type="text">
+        <input id="password" type="password">
+
+
+    </form>
+    <button id="register">注册</button>
+    <button id="login">登录</button>
+<a href="re">he</a>
+<span id="span">sas</span>
 </body>
 </html>

@@ -5,17 +5,16 @@
     <logpath></logpath>
     <mvc>
         <handlers>
-            <!--<handler></handler>-->
+            <handler>org.jsxnh.view.handler.MyHandler</handler>
         </handlers>
         <interceptors>
-            <interceptor>
-
-            </interceptor>
+            <!--<interceptor>
+                <name>inter</name>
+                <class>com.sd</class>
+            </interceptor>-->
         </interceptors>
         <statics>
-            <static>
-
-            </static>
+            <static>static</static>
         </statics>
     </mvc>
 </server>

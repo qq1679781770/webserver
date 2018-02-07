@@ -142,8 +142,9 @@ public class HttpResponse implements Response{
             //channel.register(key.selector(),SelectionKey.OP_WRITE);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
+        close();
     }
 
 
@@ -210,6 +211,7 @@ public class HttpResponse implements Response{
         stringBuilder.append("\r\n");
         String ss = stringBuilder.toString()+s;
         ByteBuffer headerbuffer = ByteBuffer.allocate(ss.getBytes().length);
+        headerbuffer.put(ss.getBytes());
         try {
             headerbuffer.flip();
             socketChannel.write(headerbuffer);
@@ -259,6 +261,7 @@ public class HttpResponse implements Response{
     }
 
     private void close(){
+
         try {
             socketChannel.shutdownInput();
             socketChannel.close();
