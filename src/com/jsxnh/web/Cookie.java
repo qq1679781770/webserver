@@ -24,4 +24,25 @@ public class Cookie {
         }
     }
 
+    public String getAttriute(String key){
+        if(isContain(key)){
+            return attributes.get(key);
+        }
+        return null;
+    }
+
+    public boolean isContain(String key){
+        if(attributes.containsKey(key))
+            return true;
+        return false;
+    }
+
+    public String getCookieStr(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String key:attributes.keySet()){
+            stringBuilder.append(key+"="+attributes.get(key)+";");
+        }
+        String s = stringBuilder.toString();
+        return s.substring(0,s.length()-1);
+    }
 }

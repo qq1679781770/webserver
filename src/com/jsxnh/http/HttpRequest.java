@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,9 +24,9 @@ public class HttpRequest implements Request{
     private HttpMethod method;
     private String charset;
     private String protocol;
-    private Map<String,Object> attributes;
+    private Map<String,Object> attributes = new HashMap<>();
 
-    private Map<String,String> headerParams;
+    private Map<String,String> headerParams = new HashMap<>();
     private InputStream inputStream;
     private Cookie cookie;
     private SocketChannel channel;
@@ -66,8 +67,10 @@ public class HttpRequest implements Request{
     public void init(){
         try {
             String requeststr = new String(bytes);
+            System.out.println(requeststr);
             initSchema(requeststr.split("\r\n")[0]);
             String[] requestheaders = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")).split("\r\n");
+
             for(int i=1;i<requestheaders.length;i++){
                 if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Content_Type")){
                     attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));

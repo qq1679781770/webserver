@@ -12,6 +12,6 @@ public @interface RequestMapping {
 
     String value();
     HttpMethod method() default HttpMethod.GET;
-    String produce();
+    String produce() default "text/html";
 
 }

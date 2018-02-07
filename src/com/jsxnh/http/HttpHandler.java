@@ -63,7 +63,7 @@ public class HttpHandler {
                 }
                 if(requestMapping.produce()!=null||!requestMapping.produce().equals("")){
                     String[] produces = requestMapping.produce().split(";");
-                    response.setContent_type(produces[0].substring(produces[0].indexOf(":")));
+                    response.setContent_type(produces[0]);
                     if(produces.length>1){
                         response.setCharset(produces[1].substring(produces[1].indexOf(":")+1));
                     }

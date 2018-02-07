@@ -29,6 +29,10 @@ public class HttpResponse implements Response{
     private String connection = "keep-alive";
     private String content_length;
     private Cookie cookie;
+    private SocketChannel socketChannel;
+
+
+
     private String statuscode = "200 OK";
 
     public static Logger logger = LoggerUtil.getLogger(HttpResponse.class);
@@ -46,10 +50,13 @@ public class HttpResponse implements Response{
         this.cookie = cookie;
     }
 
-
+    public void setStatuscode(String statuscode) {
+        this.statuscode = statuscode;
+    }
 
     public HttpResponse(SelectionKey key){
         this.key = key;
+        this.socketChannel = (SocketChannel)key.channel();
     }
 
     @Override
@@ -88,9 +95,40 @@ public class HttpResponse implements Response{
 
     @Override
     public String statuscode() {
-        return null;
+        return statuscode;
     }
 
+
+    private String getHeader(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("HTTP/1.1 "+statuscode+"\r\n");
+        if(content_type!=null){
+            stringBuilder.append("Content_Type:"+content_type);
+            if(charset!=null){
+                stringBuilder.append(";charset:"+charset);
+            }
+            stringBuilder.append("\r\n");
+        }
+        stringBuilder.append("Connection:"+connection+"\r\n");
+        stringBuilder.append("Date:"+new Date()+"\r\n");
+        stringBuilder.append("\r\n");
+        return stringBuilder.toString();
+    }
+
+    public void sendResponse(){
+        byte[] bytes = getHeader().getBytes();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bytes.length);
+        byteBuffer.put(bytes);
+        SocketChannel channel = (SocketChannel) key.channel();
+        byteBuffer.flip();
+        try {
+            channel.write(byteBuffer);
+            channel.register(key.selector(),SelectionKey.OP_WRITE);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void  sendResponse(String str){
 
@@ -101,7 +139,7 @@ public class HttpResponse implements Response{
         byteBuffer.flip();
         try {
             channel.write(byteBuffer);
-            channel.register(key.selector(),SelectionKey.OP_WRITE);
+            //channel.register(key.selector(),SelectionKey.OP_WRITE);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -142,7 +180,7 @@ public class HttpResponse implements Response{
         } catch (IOException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
-
+        close();
 
     }
 
@@ -153,10 +191,79 @@ public class HttpResponse implements Response{
     }
 
     public void sendResponseBody(String s){
-
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("HTTP/1.1 200 OK\r\n");
+        stringBuilder.append("Content_Type:"+content_type);
+        if(charset!=null){
+            stringBuilder.append(";charset:"+charset);
+        }
+        stringBuilder.append("\r\n");
+        stringBuilder.append("Connection:"+connection+"\r\n");
+        stringBuilder.append("Date:"+new Date()+"\r\n");
+        if(cookie!=null){
+            stringBuilder.append("Set-Cookie:"+cookie.getCookieStr()+"\r\n");
+        }else if(context.getRequest().getCookie()!=null){
+            stringBuilder.append("Set-Cookie:"+context.getRequest().getCookie().getCookieStr()+"\r\n");
+        }
+        byte[] b = s.getBytes();
+        stringBuilder.append("Content_Length:"+b.length+"\r\n");
+        stringBuilder.append("\r\n");
+        String ss = stringBuilder.toString()+s;
+        ByteBuffer headerbuffer = ByteBuffer.allocate(ss.getBytes().length);
+        try {
+            headerbuffer.flip();
+            socketChannel.write(headerbuffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        close();
     }
 
     public void sendResponseView(String view){
+        File file = new File(view);
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            int length = inputStream.available();
+            String header = "HTTP/1.1 200 OK\r\n"+
+                    "Content_Type:text/html;charset:utf-8\r\n"+
+                    "Content_Length:"+String.valueOf(length)+"\r\n"+
+                    "Date:"+new Date()+"\r\n";
+            if(cookie!=null){
+                header +="Set-Cookie:"+cookie.getCookieStr()+"\r\n";
+            }else if(context.getRequest().getCookie()!=null){
+                header +="Set-Cookie:"+context.getRequest().getCookie().getCookieStr()+"\r\n";
+            }
+            header +="\r\n";
+            ByteBuffer headerbuffer = ByteBuffer.allocate(header.getBytes().length);
+            byte[] bytes = new byte[1024];
+            int l = 0 ;
+            ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+            SocketChannel socketChannel = (SocketChannel)key.channel();
+            headerbuffer.put(header.getBytes());
+            headerbuffer.flip();
+            socketChannel.write(headerbuffer);
+            while ((l=inputStream.read(bytes,0,bytes.length))!=-1){
+                byteBuffer.put(ByteUtil.subBytes(bytes,0,l));
+                byteBuffer.flip();
+                socketChannel.write(byteBuffer);
+                byteBuffer.clear();
 
+            }
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        } catch (IOException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
+        close();
+    }
+
+    private void close(){
+        try {
+            socketChannel.shutdownInput();
+            socketChannel.close();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
     }
 }

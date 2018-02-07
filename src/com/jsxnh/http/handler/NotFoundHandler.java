@@ -8,7 +8,6 @@ import java.util.Date;
 public class NotFoundHandler {
 
     public static void sendResponse(Context context){
-
         String firstheader = "HTTP/1.1 404 Not Found";
         String headerparam = "";
         headerparam += "Content_Length:0\r\n";
