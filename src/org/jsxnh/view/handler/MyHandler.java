@@ -1,15 +1,13 @@
 package org.jsxnh.view.handler;
 
-import com.jsxnh.annotation.RequestBody;
-import com.jsxnh.annotation.RequestMapping;
-import com.jsxnh.annotation.Requestparam;
-import com.jsxnh.annotation.ResponseBody;
+import com.jsxnh.annotation.*;
 import com.jsxnh.http.HttpMethod;
 import com.jsxnh.http.HttpRequest;
 import com.jsxnh.web.Session;
 import org.json.JSONObject;
 import org.jsxnh.view.pojo.User;
 
+//@Interceptor("inter")
 public class MyHandler {
 
     @RequestMapping("/")
@@ -22,7 +20,7 @@ public class MyHandler {
     public String register(@Requestparam("userid")String username,@Requestparam("password") String password){
         System.out.println("用户名:"+username);
         System.out.println("密码:"+password);
-        return "yes";
+        return "res";
     }
 
     @ResponseBody
@@ -34,6 +32,10 @@ public class MyHandler {
         user.setUsername(jsonObject.getString("username"));
         user.setPassword(jsonObject.getString("password"));
         Session session = request.getSession();
+        if(session.getAttribute("user")!=null){
+            User u = (User)session.getAttribute("user");
+            System.out.println("session content:"+u.getUsername()+"==="+u.getPassword());
+        }
         session.addAttribute("user",user);
         JSONObject res = new JSONObject();
         res.put("res","success");

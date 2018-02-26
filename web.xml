@@ -8,10 +8,10 @@
             <handler>org.jsxnh.view.handler.MyHandler</handler>
         </handlers>
         <interceptors>
-            <!--<interceptor>
+            <interceptor>
                 <name>inter</name>
-                <class>com.sd</class>
-            </interceptor>-->
+                <class>org.jsxnh.view.handler.MyInterceptor</class>
+            </interceptor>
         </interceptors>
         <statics>
             <static>static</static>

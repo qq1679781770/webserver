@@ -13,7 +13,7 @@
                 console.log('sa');
                 var username = $('#userid').val();
                 var password = $('#password').val();
-                getJSON('register',{"userid":username,"password":password},function(data){
+                getStr('register',{"userid":username,"password":password},function(data){
                     console.log(data);
                 });
             });

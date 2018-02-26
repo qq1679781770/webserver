@@ -48,7 +48,9 @@ public class HttpHandler {
             }else {
                 if(c.isAnnotationPresent(Interceptor.class)){
                     try {
-                        Method method = c.getDeclaredMethod("preHandler",HttpRequest.class,HttpResponse.class);
+                        Map intermap = context.getServerConfig().getInterceptorMap();
+                        Class interClass = (Class) intermap.get(((Interceptor)c.getAnnotation(Interceptor.class)).value());
+                        Method method = interClass.getDeclaredMethod("preHandler",HttpRequest.class,HttpResponse.class);
                         boolean value = (boolean) method.invoke(((Class)context.getServerConfig().getInterceptorMap().get((String)((Interceptor)c.getAnnotation(Interceptor.class)).value())).newInstance(),request,response);
                         if(!value)
                             return;
@@ -77,7 +79,6 @@ public class HttpHandler {
                         objects[i] = new String(request.getRequestbody());
                     }else if(p.getAnnotation(Requestparam.class)!=null){
                         String value = ((Requestparam)p.getAnnotation(Requestparam.class)).value();
-                        System.out.println(value);
                         objects[i] = request.getHeaderParams().get(value);
                     }else {
                         Class aClass = p.getType();

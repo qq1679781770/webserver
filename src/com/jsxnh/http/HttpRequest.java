@@ -78,6 +78,7 @@ public class HttpRequest implements Request{
                     charset = requestheaders[i].split(";")[1].substring(requestheaders[i].split(";")[1].indexOf(":")+1);
                 }else if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Cookie")){
                     String cookies = requestheaders[i].substring(requestheaders[i].indexOf(":")+1);
+                    cookies = cookies.trim();
                     cookie = new Cookie(cookies);
                 }else{
                     attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
@@ -104,9 +105,15 @@ public class HttpRequest implements Request{
             cookie.addAttribue(Cookie.SESSION,session.getId());
             return session;
         }
-        System.out.println(cookie.getCookieStr());
+
         String id = cookie.getAttriute(Cookie.SESSION);
         Session session = Session.getSession(id);
+        if(session==null){
+            session = new Session();
+            session.setId(Session.generatorId());
+            Session.addSession(session.getId(),session);
+            cookie.addAttribue(Cookie.SESSION,session.getId());
+        }
         return session;
     }
 
