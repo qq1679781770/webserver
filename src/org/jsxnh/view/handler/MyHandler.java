@@ -3,7 +3,9 @@ package org.jsxnh.view.handler;
 import com.jsxnh.annotation.*;
 import com.jsxnh.http.HttpMethod;
 import com.jsxnh.http.HttpRequest;
+import com.jsxnh.web.ModelAndView;
 import com.jsxnh.web.Session;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsxnh.view.pojo.User;
 
@@ -43,5 +45,22 @@ public class MyHandler {
     }
 
 
+    @RequestMapping(value = "/testModel",method = HttpMethod.GET)
+    public ModelAndView testModelAndView(){
+
+        ModelAndView modelAndView = new ModelAndView("html/testmodel.html");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name","csb数独书");
+        jsonObject.put("asa",false);
+        modelAndView.addObject("jsonobject",jsonObject.toString());
+        modelAndView.addObject("str","str");
+        modelAndView.addObject("int",1);
+        modelAndView.addObject("bool",false);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put(jsonObject);
+        jsonArray.put(jsonObject);
+        modelAndView.addObject("jsonarray",jsonArray.toString());
+        return modelAndView;
+    }
 
 }

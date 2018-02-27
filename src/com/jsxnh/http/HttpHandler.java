@@ -100,6 +100,7 @@ public class HttpHandler {
                             response.sendResponseView((String) m.invoke(c.newInstance(), objects));
                         }
                     } else if (returntype == ModelAndView.class) {
+                        System.out.println("sasasasas");
                         response.sendResponse((ModelAndView) m.invoke(c.newInstance(), objects));
                     }
                 }catch (Exception e){

@@ -5,6 +5,7 @@ import com.jsxnh.http.api.Response;
 import com.jsxnh.util.ByteUtil;
 import com.jsxnh.util.ContentTypeUtil;
 import com.jsxnh.util.LoggerUtil;
+import com.jsxnh.util.Tokenizer;
 import com.jsxnh.web.Cookie;
 import com.jsxnh.web.ModelAndView;
 
@@ -182,12 +183,27 @@ public class HttpResponse implements Response{
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
         close();
-
     }
 
 
     public void sendResponse(ModelAndView modelAndView){
-
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(new File(modelAndView.getViewname())));
+            String s;
+            while ((s=reader.readLine())!=null){
+                stringBuilder.append(s);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Tokenizer tokenizer = new Tokenizer(stringBuilder.toString(),modelAndView.getAttributes());
+        content_type = "text/html";
+        String s = tokenizer.parse();
+        System.out.println(s);
+        sendResponseBody(s);
 
     }
 
