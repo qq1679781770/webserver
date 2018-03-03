@@ -3,13 +3,14 @@ package com.jsxnh.http;
 import com.jsxnh.config.ServerConfig;
 import com.jsxnh.http.abs.Context;
 import com.jsxnh.http.api.Request;
+import com.jsxnh.util.ByteUtil;
 import com.jsxnh.util.LoggerUtil;
 import com.jsxnh.web.Cookie;
 import com.jsxnh.web.Session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.nio.*;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,8 +34,9 @@ public class HttpRequest implements Request{
     private String referer;
     private Context context;
     private byte[] bytes;
-
-
+    private String boundary;
+    private int content_length;
+    private boolean isok;
 
     private byte[] requestbody;
 
@@ -42,6 +44,7 @@ public class HttpRequest implements Request{
 
     public HttpRequest(SocketChannel sc){
         this.channel = sc;
+        isok = false;
     }
 
     public byte[] doread(){
@@ -67,27 +70,70 @@ public class HttpRequest implements Request{
     public void init(){
         try {
             String requeststr = new String(bytes);
+            int totalsize = bytes.length;
+            System.out.println(totalsize);
             System.out.println(requeststr);
-            initSchema(requeststr.split("\r\n")[0]);
-            String[] requestheaders = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")).split("\r\n");
+            if(requeststr.split("\r\n")[0].split(" ").length==3){
+                initSchema(requeststr.split("\r\n")[0]);
+                String[] requestheaders = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")).split("\r\n");
+                for(int i=1;i<requestheaders.length;i++){
+                    String quaramkey = requestheaders[i].substring(0,requestheaders[i].indexOf(":"));
+                    if(quaramkey.equals("Content-Type")){
+                        attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
+                        context_type = requestheaders[i].split(";")[0].substring(requestheaders[i].indexOf(":")+1).trim();
+                        String key  = requestheaders[i].split(";")[1].substring(0,requestheaders[i].split(";")[1].indexOf("=")).trim();
+                        if(key.equals("charset")){
+                            charset = requestheaders[i].split(";")[1].substring(requestheaders[i].split(";")[1].indexOf("=")+1);
+                        }else if(key.equals("boundary")){
+                            boundary = requestheaders[i].split(";")[1].substring(requestheaders[i].split(";")[1].indexOf("=")+1);
+                        }
+                    }else if(quaramkey.equals("Cookie")){
+                        String cookies = requestheaders[i].substring(requestheaders[i].indexOf(":")+1);
+                        cookies = cookies.trim();
+                        cookie = new Cookie(cookies);
+                    }else if(quaramkey.equals("Content-Length")){
+                        content_length = Integer.parseInt(requestheaders[i].substring(requestheaders[i].indexOf(":")+1).trim());
+                    } else{
+                        attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
+                    }
+                }
 
-            for(int i=1;i<requestheaders.length;i++){
-                if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Content_Type")){
-                    attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
-                    context_type = requestheaders[i].split(";")[0].substring(requestheaders[i].indexOf(":")+1);
-                    charset = requestheaders[i].split(";")[1].substring(requestheaders[i].split(";")[1].indexOf(":")+1);
-                }else if(requestheaders[i].substring(0,requestheaders[i].indexOf(":")).equals("Cookie")){
-                    String cookies = requestheaders[i].substring(requestheaders[i].indexOf(":")+1);
-                    cookies = cookies.trim();
-                    cookie = new Cookie(cookies);
+
+                if(context_type!=null&&context_type.equals("multipart/form-data")){
+                    String requestheader = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")+"\r\n\r\n".length());
+                    int requestheadersize = requestheader.getBytes().length;
+                    //System.out.println(requestheadersize);
+                    //System.out.println(content_length);
+                    if(totalsize-requestheadersize !=content_length){
+                        String res = "HTTP/1.1 100 Continue\r\n\r\n";
+                        byte[] b = res.getBytes();
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(b.length);
+                        byteBuffer.put(b);
+                        byteBuffer.flip();
+                        channel.write(byteBuffer);
+
+                    }else{
+                        isok = true;
+                    }
                 }else{
-                    attributes.put(requestheaders[i].substring(0,requestheaders[i].indexOf(":")),requestheaders[i].substring(requestheaders[i].indexOf(":")+1));
+                    isok = true;
+                }
+                requestbody = requeststr.substring(requeststr.indexOf("\r\n\r\n")+"\r\n\r\n".length()).getBytes();
+            }else{
+                if(context_type!=null&&context_type.equals("multipart/form-data")){
+                    requestbody = ByteUtil.merge(requestbody,bytes);
+                    if(requestbody.length==content_length){
+                        isok = true;
+                    }else{
+                        String res = "HTTP/1.1 100 Continue\r\n\r\n";
+                        byte[] b = res.getBytes();
+                        ByteBuffer byteBuffer = ByteBuffer.allocate(b.length);
+                        byteBuffer.put(b);
+                        byteBuffer.flip();
+                        channel.write(byteBuffer);
+                    }
                 }
             }
-            requestbody = requeststr.substring(requeststr.indexOf("\r\n\r\n")+"\r\n\r\n".length()).getBytes();
-
-
-
         }catch (Exception e){
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
@@ -216,4 +262,7 @@ public class HttpRequest implements Request{
         return headerParams;
     }
 
+    public boolean isOk(){
+        return isok;
+    }
 }

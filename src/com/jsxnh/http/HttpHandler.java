@@ -12,7 +12,6 @@ import com.jsxnh.web.ModelAndView;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,7 +22,7 @@ public class HttpHandler {
     public static Logger logger = LoggerUtil.getLogger(HttpHandler.class);
 
     public static void init(Context context){
-        ((HttpRequest)context.getRequest()).init();
+        //((HttpRequest)context.getRequest()).init();
         String url = context.getRequest().getUri();
         Map handlerMap = context.getServerConfig().getRouter().getRouterMap();
         if(!handlerMap.containsKey(url)){
@@ -67,7 +66,7 @@ public class HttpHandler {
                     String[] produces = requestMapping.produce().split(";");
                     response.setContent_type(produces[0]);
                     if(produces.length>1){
-                        response.setCharset(produces[1].substring(produces[1].indexOf(":")+1));
+                        response.setCharset(produces[1].substring(produces[1].indexOf("=")+1));
                     }
                 }
 
@@ -100,7 +99,6 @@ public class HttpHandler {
                             response.sendResponseView((String) m.invoke(c.newInstance(), objects));
                         }
                     } else if (returntype == ModelAndView.class) {
-                        System.out.println("sasasasas");
                         response.sendResponse((ModelAndView) m.invoke(c.newInstance(), objects));
                     }
                 }catch (Exception e){

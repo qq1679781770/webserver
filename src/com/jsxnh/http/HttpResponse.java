@@ -106,7 +106,7 @@ public class HttpResponse implements Response{
         if(content_type!=null){
             stringBuilder.append("Content_Type:"+content_type);
             if(charset!=null){
-                stringBuilder.append(";charset:"+charset);
+                stringBuilder.append(";charset="+charset);
             }
             stringBuilder.append("\r\n");
         }
@@ -157,7 +157,7 @@ public class HttpResponse implements Response{
             FileInputStream inputStream = new FileInputStream(file);
             int length = inputStream.available();
             String header = "HTTP/1.1 200 OK\r\n"+
-                    "Content_Type:"+context_type+";charset:utf-8\r\n"+
+                    "Content_Type:"+context_type+";charset=utf-8\r\n"+
                     "Content_Length:"+String.valueOf(length)+"\r\n"+
                     "Date:"+new Date()+"\r\n\r\n";
 
@@ -212,7 +212,7 @@ public class HttpResponse implements Response{
         stringBuilder.append("HTTP/1.1 200 OK\r\n");
         stringBuilder.append("Content_Type:"+content_type);
         if(charset!=null){
-            stringBuilder.append(";charset:"+charset);
+            stringBuilder.append(";charset="+charset);
         }
         stringBuilder.append("\r\n");
         stringBuilder.append("Connection:"+connection+"\r\n");
@@ -243,7 +243,7 @@ public class HttpResponse implements Response{
             FileInputStream inputStream = new FileInputStream(file);
             int length = inputStream.available();
             String header = "HTTP/1.1 200 OK\r\n"+
-                    "Content_Type:text/html;charset:utf-8\r\n"+
+                    "Content_Type:text/html;charset=utf-8\r\n"+
                     "Content_Length:"+String.valueOf(length)+"\r\n"+
                     "Date:"+new Date()+"\r\n";
             if(cookie!=null){
@@ -281,6 +281,7 @@ public class HttpResponse implements Response{
         try {
             socketChannel.shutdownInput();
             socketChannel.close();
+            HttpHandlerRunable.channelServerContextMap.remove(socketChannel);
         } catch (IOException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }

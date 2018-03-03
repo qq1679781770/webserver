@@ -8,6 +8,7 @@ import com.jsxnh.web.Session;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsxnh.view.pojo.User;
+import org.jsxnh.view.service.KyService;
 
 //@Interceptor("inter")
 public class MyHandler {
@@ -62,5 +63,20 @@ public class MyHandler {
         modelAndView.addObject("jsonarray",jsonArray.toString());
         return modelAndView;
     }
+
+
+    @RequestMapping(value = "/ky",method = HttpMethod.GET)
+    public ModelAndView findkyQuestions(){
+        ModelAndView modelAndView = new ModelAndView("html/ky.html");
+        KyService kyService= new KyService();
+        modelAndView.addObject("questions",kyService.getQuestions().toString());
+        return  modelAndView;
+    }
+
+    @RequestMapping(value = "/form",method = HttpMethod.GET)
+    public String testForm(){
+        return "html/form.html";
+    }
+
 
 }

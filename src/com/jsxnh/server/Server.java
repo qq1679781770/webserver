@@ -76,7 +76,10 @@ public class Server {
                                 }
                             }
                         } else if (key.isReadable()) {
-                            new HttpHandlerRunable((SocketChannel) key.channel(),key).doRead();
+                            if(key.channel().isOpen()){
+                                new HttpHandlerRunable((SocketChannel) key.channel(),key).doRead();
+                            }
+
                         }else if (key.isWritable()) {
                             //该key有Write事件
                             logger.info("有流写出!");

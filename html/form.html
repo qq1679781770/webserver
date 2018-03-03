@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/jsxnh.js"></script>
+    <script>
+        function submit(){
+            var formData = new FormData(document.getElementById("tf"));
+            $.ajax({
+                 url: 'fileupload',
+                 type: 'POST',
+                 cache: false,
+                 data:formData,
+                 processData: false,
+                 contentType: false
+             }).done(function(res) {
+
+              }).fail(function(res) {});
+
+        }
+
+    </script>
+</head>
+<body>
+
+
+<form id="tf">
+    <label>用户名</label>
+    <input name="username" type="text">
+    <label>密码</label>
+    <input type="text" name="password">
+    <label>文件</label>
+    <input type="file" name="file">
+</form>
+<button onclick="submit();">提交</button>
+
+</body>
+</html>

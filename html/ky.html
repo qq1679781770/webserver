@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="static/js/jquery.min.js"></script>
+    <script src="static/js/jsxnh.js"></script>
+    <script src="static/js/vue.min.js"></script>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css"/>
+    <script>
+
+        $(function(){
+
+            var datas = ${questions};
+            var vm = new Vue({
+                el:'.table',
+                data:{
+                    items:datas
+                }
+            });
+
+        });
+    </script>
+</head>
+<body>
+
+<table class="table table-border table-hover">
+    <thead>
+    <tr>
+        <th>问题</th>
+        <th>id</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr v-for="item in items">
+            <td>{{ item.question }}</td>
+            <td>{{ item.question_id }}</td>
+        <tr>
+    </tbody>
+</table>
+
+</body>
+</html>
