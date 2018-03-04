@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import org.jsxnh.view.pojo.User;
 import org.jsxnh.view.service.KyService;
 
-//@Interceptor("inter")
+@Interceptor("inter")
 public class MyHandler {
 
     @RequestMapping("/")
@@ -78,5 +78,14 @@ public class MyHandler {
         return "html/form.html";
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/fileupload",method = HttpMethod.POST,produce = "text/plain")
+    public String fileupload(HttpRequest request){
+        System.out.println(request.getAttribute("username"));
+        System.out.println(request.getAttribute("password"));
+        System.out.println(request.getFiles("file1").length);
+        System.out.println(request.getFiles("file2").length);
+        return "res";
+    }
 
 }

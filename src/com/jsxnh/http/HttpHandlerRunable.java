@@ -3,7 +3,6 @@ package com.jsxnh.http;
 import com.jsxnh.http.abs.Context;
 import com.jsxnh.util.LoggerUtil;
 
-import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ public class HttpHandlerRunable{
             new Thread(){
                 @Override
                 public void run(){
-                    System.out.println("new Thread run");
+                    //System.out.println("new Thread run");
                     HttpHandler.init(context);
                 }
             }.start();

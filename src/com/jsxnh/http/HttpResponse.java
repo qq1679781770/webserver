@@ -129,6 +129,7 @@ public class HttpResponse implements Response{
         } catch (IOException e) {
             e.printStackTrace();
         }
+        close();
     }
 
     public void  sendResponse(String str){
@@ -150,7 +151,7 @@ public class HttpResponse implements Response{
 
 
     public void sendResponse(File file){
-        String filesuffix = file.getName().substring(file.getName().indexOf("."));
+        String filesuffix = file.getName().substring(file.getName().lastIndexOf("."));
         String context_type = ContentTypeUtil.getContent_Type(filesuffix);
 
         try {
@@ -202,9 +203,7 @@ public class HttpResponse implements Response{
         Tokenizer tokenizer = new Tokenizer(stringBuilder.toString(),modelAndView.getAttributes());
         content_type = "text/html";
         String s = tokenizer.parse();
-        System.out.println(s);
         sendResponseBody(s);
-
     }
 
     public void sendResponseBody(String s){
@@ -279,6 +278,7 @@ public class HttpResponse implements Response{
     private void close(){
 
         try {
+            key.cancel();
             socketChannel.shutdownInput();
             socketChannel.close();
             HttpHandlerRunable.channelServerContextMap.remove(socketChannel);

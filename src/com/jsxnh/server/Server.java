@@ -42,6 +42,7 @@ public class Server {
             serverChannel.configureBlocking(false);
             serverChannel.register(selector, SelectionKey.OP_ACCEPT);
             logger.info("server listen on port:"+serverConfig.getPort());
+            logger.info("please open:http://localhost:"+serverConfig.getPort());
         } catch (IOException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
@@ -60,6 +61,8 @@ public class Server {
                     try {
                         SelectionKey key = iterator.next();
                         SocketChannel channel = null;
+                        if(!key.isValid())
+                            continue;
                         if (key.isAcceptable()) {
                             ServerSocketChannel server = (ServerSocketChannel) key.channel();
                             try {
@@ -81,11 +84,12 @@ public class Server {
                             }
 
                         }else if (key.isWritable()) {
-                            //该key有Write事件
+                            /*
                             logger.info("有流写出!");
                             SocketChannel socketChannel = (SocketChannel)key.channel();
                             socketChannel.socket().close();
                             socketChannel.close();
+                            */
                         }
                     } catch (IOException e) {
                     } catch (Exception e) {

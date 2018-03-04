@@ -2,6 +2,7 @@ package com.jsxnh.http;
 
 import com.jsxnh.annotation.*;
 import com.jsxnh.http.abs.Context;
+import com.jsxnh.http.handler.ForbiddenHandler;
 import com.jsxnh.http.handler.InterErrorHandler;
 import com.jsxnh.http.handler.NotFoundHandler;
 import com.jsxnh.http.handler.StaticHandler;
@@ -22,17 +23,15 @@ public class HttpHandler {
     public static Logger logger = LoggerUtil.getLogger(HttpHandler.class);
 
     public static void init(Context context){
-        //((HttpRequest)context.getRequest()).init();
+        ((HttpRequest)context.getRequest()).initBody();
         String url = context.getRequest().getUri();
         Map handlerMap = context.getServerConfig().getRouter().getRouterMap();
         if(!handlerMap.containsKey(url)){
             NotFoundHandler.sendResponse(context);
         }else{
-
             parseController((Controller) handlerMap.get(url),context);
-
         }
-
+        ((HttpRequest)context.getRequest()).clearFile();
     }
 
 
@@ -51,8 +50,10 @@ public class HttpHandler {
                         Class interClass = (Class) intermap.get(((Interceptor)c.getAnnotation(Interceptor.class)).value());
                         Method method = interClass.getDeclaredMethod("preHandler",HttpRequest.class,HttpResponse.class);
                         boolean value = (boolean) method.invoke(((Class)context.getServerConfig().getInterceptorMap().get((String)((Interceptor)c.getAnnotation(Interceptor.class)).value())).newInstance(),request,response);
-                        if(!value)
+                        if(!value){
+                            ForbiddenHandler.sendResponse(context);
                             return;
+                        }
                     } catch (NoSuchMethodException e) {
                         logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
                     }
@@ -115,9 +116,5 @@ public class HttpHandler {
         } catch (InvocationTargetException e) {
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
-
-
     }
-
-
 }
