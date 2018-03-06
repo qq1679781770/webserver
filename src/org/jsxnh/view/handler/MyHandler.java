@@ -3,6 +3,7 @@ package org.jsxnh.view.handler;
 import com.jsxnh.annotation.*;
 import com.jsxnh.http.HttpMethod;
 import com.jsxnh.http.HttpRequest;
+import com.jsxnh.http.HttpResponse;
 import com.jsxnh.web.ModelAndView;
 import com.jsxnh.web.Session;
 import org.json.JSONArray;
@@ -10,7 +11,9 @@ import org.json.JSONObject;
 import org.jsxnh.view.pojo.User;
 import org.jsxnh.view.service.KyService;
 
-@Interceptor("inter")
+import java.io.File;
+
+//@Interceptor("inter")
 public class MyHandler {
 
     @RequestMapping("/")
@@ -86,6 +89,11 @@ public class MyHandler {
         System.out.println(request.getFiles("file1").length);
         System.out.println(request.getFiles("file2").length);
         return "res";
+    }
+
+    @RequestMapping(value = "/filedownload")
+    public void download(HttpResponse response){
+        response.writeFile(new File("img9.jpg"));
     }
 
 }

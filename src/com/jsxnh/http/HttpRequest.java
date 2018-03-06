@@ -50,7 +50,7 @@ public class HttpRequest implements Request{
         isok = false;
     }
 
-    public byte[] doread(){
+    public synchronized byte[] doread(){
         try {
             ByteBuffer buffer = ByteBuffer.allocate(1024);
 
@@ -74,7 +74,6 @@ public class HttpRequest implements Request{
         try {
             String requeststr = new String(bytes);
             int totalsize = bytes.length;
-            //System.out.println(requeststr);
             if(requeststr.split("\r\n")[0].split(" ").length==3){
                 initSchema(requeststr.split("\r\n")[0]);
                 String[] requestheaders = requeststr.substring(0,requeststr.indexOf("\r\n\r\n")).split("\r\n");
@@ -186,6 +185,8 @@ public class HttpRequest implements Request{
                 }else{
                     int size = s.substring(0,s.indexOf("\r\n\r\n")+"\r\n\r\n".length()).getBytes().length;
                     byte[] filebyte = ByteUtil.subBytes(b,size,b.length-size);
+                    if(filename.equals("")||filename==null)
+                        continue;
                     File file = new File(filename);
                     try {
                         FileUtil.writeTofile(file,filebyte);

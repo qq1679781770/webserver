@@ -30,6 +30,10 @@ public class HttpResponse implements Response{
     private String connection = "keep-alive";
     private String content_length;
     private Cookie cookie;
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
+    }
+
     private SocketChannel socketChannel;
 
 
@@ -242,7 +246,7 @@ public class HttpResponse implements Response{
             FileInputStream inputStream = new FileInputStream(file);
             int length = inputStream.available();
             String header = "HTTP/1.1 200 OK\r\n"+
-                    "Content_Type:text/html;charset=utf-8\r\n"+
+                    "Content-Type:text/html;charset=utf-8\r\n"+
                     "Content_Length:"+String.valueOf(length)+"\r\n"+
                     "Date:"+new Date()+"\r\n";
             if(cookie!=null){
@@ -273,6 +277,34 @@ public class HttpResponse implements Response{
             logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
         }
         close();
+    }
+
+    public void writeFile(File file){
+        try {
+                String filename = file.getName();
+                String header = "HTTP/1.1 200 OK\r\nContent-Disposition:attachment;filename="+filename+"\r\n"+
+                    "Content-Type: application/octet-stream\r\n";
+                FileInputStream inputStream = new FileInputStream(file);
+                int length = inputStream.available();
+                header +="Content-Length:"+length+"\r\n\r\n";
+                ByteBuffer headerbuffer = ByteBuffer.allocate(header.getBytes().length);
+                SocketChannel socketChannel = (SocketChannel)key.channel();
+                headerbuffer.put(header.getBytes());
+                headerbuffer.flip();
+                socketChannel.write(headerbuffer);
+                ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+                byte[] bytes = new byte[1024];
+                int l = 0 ;
+                while ((l=inputStream.read(bytes,0,bytes.length))!=-1){
+                    byteBuffer.put(ByteUtil.subBytes(bytes,0,l));
+                    byteBuffer.flip();
+                    socketChannel.write(byteBuffer);
+                    byteBuffer.clear();
+                }
+               close();
+        } catch (IOException e) {
+            logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
+        }
     }
 
     private void close(){

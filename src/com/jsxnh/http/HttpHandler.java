@@ -10,6 +10,7 @@ import com.jsxnh.util.LoggerUtil;
 import com.jsxnh.web.Controller;
 import com.jsxnh.web.ModelAndView;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -70,7 +71,6 @@ public class HttpHandler {
                         response.setCharset(produces[1].substring(produces[1].indexOf("=")+1));
                     }
                 }
-
                 Parameter[] parameters = m.getParameters();
                 Object[] objects = new Object[parameters.length];
                 for(int i=0;i<parameters.length;i++){
@@ -93,6 +93,9 @@ public class HttpHandler {
                 try {
                     if (returntype == void.class) {
                         m.invoke(c.newInstance(), objects);
+                        if(response.getSocketChannel().isOpen()){
+                            response.sendResponse();
+                        }
                     } else if (returntype == String.class) {
                         if (m.isAnnotationPresent(ResponseBody.class)) {
                             response.sendResponseBody((String) m.invoke(c.newInstance(), objects));
@@ -101,6 +104,8 @@ public class HttpHandler {
                         }
                     } else if (returntype == ModelAndView.class) {
                         response.sendResponse((ModelAndView) m.invoke(c.newInstance(), objects));
+                    }else if(returntype == File.class){
+                        response.writeFile((File)m.invoke(c.newInstance(),objects));
                     }
                 }catch (Exception e){
                     logger.log(Level.SEVERE,LoggerUtil.recordStackTraceMsg(e));
